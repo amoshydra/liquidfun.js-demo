@@ -1,111 +1,12 @@
+import * as PIXI from 'pixi.js';
+
 function highest2(x) {
-    return Math.pow(2, Math.ceil(Math.log(x) / Math.LN2));
+  return Math.pow(2, Math.ceil(Math.log(x) / Math.LN2));
 };
 
-function LiquidfunSprite(particleSystem) {
-    PIXI.Container.call(this);
-
-    this.particleSystem = particleSystem;
-
-    let ball_vert = `
-    attribute vec2 position;
-    attribute vec4 color;
-    varying vec4 vColor;
-    uniform float size;
-
-    void main() {
-        vColor = vec4(color.x/ 255.0, color.y / 255.0, color.z / 255.0, 1);
-        gl_Position = vec4(position, 0.0, 1.0);
-        gl_PointSize = size;
-    }`;
-
-    let ball_frag = `
-    precision mediump float;
-    varying vec4 vColor;
-
-    void main() {
-        if (distance(vec2(0.0, 0.0), gl_PointCoord.xy - 0.5) < 0.5) {
-            //gl_FragColor = vColor;
-            gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);
-        } else {
-            gl_FragColor = vec4(0.0, 0.0, 0.0, 0.0);
-        }
-    }`;
-
-    let identity_vert = `
-    attribute vec2 position;
-
-    void main() {
-        gl_Position = vec4(position, 0.0, 1.0);
-    }`;
-
-    let blur_frag = `
-    precision mediump float;
-
-    uniform sampler2D base;
-    uniform vec2 scale;
-    uniform vec2 dir;
-
-    void main() {
-        vec2 p = gl_FragCoord.xy / scale;
-        gl_FragColor =
-            texture2D(base, p + dir * vec2(-9.0, -9.0) / scale) * 0.02433 +
-            texture2D(base, p + dir * vec2(-8.0, -8.0) / scale) * 0.03081 +
-            texture2D(base, p + dir * vec2(-7.0, -7.0) / scale) * 0.03795 +
-            texture2D(base, p + dir * vec2(-6.0, -6.0) / scale) * 0.04546 +
-            texture2D(base, p + dir * vec2(-5.0, -5.0) / scale) * 0.05297 +
-            texture2D(base, p + dir * vec2(-4.0, -4.0) / scale) * 0.06002 +
-            texture2D(base, p + dir * vec2(-3.0, -3.0) / scale) * 0.06615 +
-            texture2D(base, p + dir * vec2(-2.0, -2.0) / scale) * 0.07090 +
-            texture2D(base, p + dir * vec2(-1.0, -1.0) / scale) * 0.07392 +
-            texture2D(base, p + dir * vec2( 0.0,  0.0) / scale) * 0.07495 +
-            texture2D(base, p + dir * vec2( 1.0,  1.0) / scale) * 0.07392 +
-            texture2D(base, p + dir * vec2( 2.0,  2.0) / scale) * 0.07090 +
-            texture2D(base, p + dir * vec2( 3.0,  3.0) / scale) * 0.06615 +
-            texture2D(base, p + dir * vec2( 4.0,  4.0) / scale) * 0.06002 +
-            texture2D(base, p + dir * vec2( 5.0,  5.0) / scale) * 0.05297 +
-            texture2D(base, p + dir * vec2( 6.0,  6.0) / scale) * 0.04546 +
-            texture2D(base, p + dir * vec2( 7.0,  7.0) / scale) * 0.03795 +
-            texture2D(base, p + dir * vec2( 8.0,  8.0) / scale) * 0.03081 +
-            texture2D(base, p + dir * vec2( 9.0,  9.0) / scale) * 0.02433;
-    }`;
-
-    let threshold_frag = `
-    precision mediump float;
-
-    uniform sampler2D base;
-    uniform vec2 scale;
-    uniform float threshold;
-    uniform vec4 color;
-
-    void main() {
-        vec4 value = texture2D(base, gl_FragCoord.xy / scale);
-        if (value.r > threshold) {
-            gl_FragColor = color;
-            //gl_FragColor = vec4(value.rgb, alpha);
-        } else {
-            gl_FragColor = vec4(0.0, 0.0, 0.0, 0.0);
-        }
-    }`;
-
-    this.ball_shader = new PIXI.glCore.GLShader(renderer.renderer.gl, ball_vert, ball_frag);
-    this.blur_shader = new PIXI.glCore.GLShader(renderer.renderer.gl, identity_vert, blur_frag);
-    this.threshold_shader = new PIXI.glCore.GLShader(renderer.renderer.gl, identity_vert, threshold_frag);
-    this.pos_buffer = renderer.renderer.gl.createBuffer();
-    this.color_buffer = renderer.renderer.gl.createBuffer();
-    this.quadbuffer = renderer.renderer.gl.createBuffer();
-}
-
-LiquidfunSprite.prototype = Object.create(PIXI.Container.prototype);
-LiquidfunSprite.prototype.constructor = LiquidfunSprite;
-
-LiquidfunSprite.prototype._renderWebGL = function (renderer) {
-    renderer.setObjectRenderer(renderer.plugins.liquidfun);
-    renderer.plugins.liquidfun.render(this);
-};
-
-function LiquidfunRenderer(renderer) {
-    PIXI.ObjectRenderer.call(this, renderer);
+export class LiquidfunRenderer extends PIXI.ObjectRenderer {
+  constructor(renderer) {
+    super(renderer);
     this.renderer  = renderer;
 
     this.currentBatchSize = 0;
@@ -116,14 +17,9 @@ function LiquidfunRenderer(renderer) {
     this.textures = null;
     this.blurRadius = 3.2;
     this.threshold = 0.5;
-}
+  }
 
-LiquidfunRenderer.prototype = Object.create(PIXI.ObjectRenderer.prototype);
-LiquidfunRenderer.prototype.constructor = LiquidfunRenderer;
-
-PIXI.WebGLRenderer.registerPlugin('liquidfun', LiquidfunRenderer);
-
-LiquidfunRenderer.prototype.swap = function () {
+  swap() {
     let gl = this.renderer.gl,
         temp = this.textures.front;
     this.textures.front = this.textures.back;
@@ -135,14 +31,14 @@ LiquidfunRenderer.prototype.swap = function () {
     gl.clearColor(0, 0, 0, 1);
     gl.clear(gl.COLOR_BUFFER_BIT);
     gl.bindTexture(gl.TEXTURE_2D, this.textures.front);
-};
+  }
 
-LiquidfunRenderer.prototype.texScale = function() {
+  texScale() {
     return new Float32Array([highest2(this.renderer.width),
         highest2(this.renderer.height)]);
-};
+  }
 
-LiquidfunRenderer.prototype.createTexture = function(gl) {
+  createTexture(gl) {
     let tex = gl.createTexture();
     let scale = this.texScale();
     gl.bindTexture(gl.TEXTURE_2D, tex);
@@ -153,9 +49,9 @@ LiquidfunRenderer.prototype.createTexture = function(gl) {
     gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, scale[0], scale[1],
         0, gl.RGBA, gl.UNSIGNED_BYTE, null);
     return tex;
-};
+  }
 
-LiquidfunRenderer.prototype.render = function (sprite) {
+  render(sprite) {
     let renderer = this.renderer;
     let gl = renderer.gl;
 
@@ -259,7 +155,8 @@ LiquidfunRenderer.prototype.render = function (sprite) {
 
     //renderer.state.pop();
 
-};
+  }
 
-LiquidfunRenderer.prototype.destroy = function () {
-};
+  destroy() {
+  }
+}
