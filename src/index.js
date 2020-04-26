@@ -37,11 +37,6 @@ function init() {
   pixiApp = new PIXI.Application(w, h, { backgroundColor : 0x091425 });
   document.body.appendChild(pixiApp.view);
 
-  //let killerShape = new Box2D.b2PolygonShape;
-  //killerShape.SetAsBox(w, h);
-  //let killerTransform = new Box2D.b2Transform;
-  //killerTransform.Set(new Box2D.b2Vec2(0, 0), 0);
-
   // shift 0/0 to the center
   pixiApp.stage.position.x = w/2;
   pixiApp.stage.position.y = h/2;
