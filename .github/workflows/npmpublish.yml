@@ -15,6 +15,7 @@ jobs:
       - uses: actions/setup-node@v1
         with:
           node-version: 12
+      - run: yarn ci
       - run: yarn build
 
   publish-ghpages:
@@ -26,6 +27,7 @@ jobs:
         with:
           node-version: 12
           registry-url: https://registry.npmjs.org/
+      - run: yarn ci
       - name: GitHub Pages
         uses: crazy-max/ghaction-github-pages@v1.4.0
         with:
