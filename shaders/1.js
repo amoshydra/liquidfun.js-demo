@@ -1,0 +1,1 @@
+(window.webpackJsonp=window.webpackJsonp||[]).push([[2],{194:function(o,n,i){"use strict";i.r(n),n.default="attribute vec2 position;\n  attribute vec4 color;\n  varying vec4 vColor;\n  uniform float size;\n\n  void main() {\n    vColor = vec4(color.x/ 255.0, color.y / 255.0, color.z / 255.0, 1);\n    gl_Position = vec4(position, 0.0, 1.0);\n    gl_PointSize = size;\n  }"}}]);

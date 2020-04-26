@@ -1,0 +1,1 @@
+(window.webpackJsonp=window.webpackJsonp||[]).push([[4],{196:function(n,i,o){"use strict";o.r(i),i.default="attribute vec2 position;\n\n  void main() {\n    gl_Position = vec4(position, 0.0, 1.0);\n  }"}}]);
