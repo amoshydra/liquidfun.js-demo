@@ -77,12 +77,14 @@ function init() {
 
   createBox(0, 0, 5, 1, true);
 
-  pixiApp.ticker.add(function() {
-    for (let i=0,s=sprites[i];i<sprites.length;s=sprites[++i]) {
-      let pos = s.body.GetPosition();
-      s.position.set(pos.get_x()*window.PTM, -pos.get_y()*window.PTM);
-      s.rotation = -s.body.GetAngle();
+  pixiApp.ticker.add(() => {
+    // Sync box and its physics
+    for (let sprite of sprites) {
+      const pos = sprite.body.GetPosition();
+      sprite.position.set(pos.get_x() * window.PTM, -pos.get_y() * window.PTM);
+      sprite.rotation = -sprite.body.GetAngle();
     }
+
     stats.update();
   });
 
