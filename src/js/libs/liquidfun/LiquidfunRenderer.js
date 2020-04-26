@@ -1,4 +1,5 @@
 import * as PIXI from 'pixi.js';
+import { PTM } from './../PTM';
 
 function highest2(x) {
   return Math.pow(2, Math.ceil(Math.log(x) / Math.LN2));
@@ -98,8 +99,8 @@ export class LiquidfunRenderer extends PIXI.ObjectRenderer {
       let position = new Float32Array(count*2);
       // transform physics engine coords to renderer coords
       for (let i = 0; i < count; i++) {
-        position[i*2]   = (raw_pos[i*2]   - fx) * 2 * window.PTM / w;
-        position[i*2+1] = (raw_pos[i*2+1] - fy) * 2 * window.PTM / h;
+        position[i*2]   = (raw_pos[i*2]   - fx) * 2 * PTM / w;
+        position[i*2+1] = (raw_pos[i*2+1] - fy) * 2 * PTM / h;
       }
       // upload data to gpu
       gl.bindBuffer(gl.ARRAY_BUFFER, sprite.pos_buffer);
@@ -125,7 +126,7 @@ export class LiquidfunRenderer extends PIXI.ObjectRenderer {
       this.swap();
       gl.bindTexture(gl.TEXTURE_2D, this.textures.front);
 
-      sprite.ball_shader.uniforms.size = radius * window.PTM * this.blurRadius;
+      sprite.ball_shader.uniforms.size = radius * PTM * this.blurRadius;
       gl.drawArrays(gl.POINTS, 0, count);
       this.swap();
 

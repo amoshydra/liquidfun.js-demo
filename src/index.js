@@ -3,13 +3,13 @@ import Stats from 'stats.js';
 import { LiquidfunRenderer } from './js/libs/liquidfun/LiquidfunRenderer.js';
 import { LiquidfunSprite } from './js/libs/liquidfun/LiquidfunSprite.js';
 import { RainMaker } from './js/libs/RainMaker';
+import { PTM } from './js/libs/PTM';
 
 PIXI.WebGLRenderer.registerPlugin('liquidfun', LiquidfunRenderer);
 
 let sprites = [];
 let world;
 let pixiApp;
-window.PTM = 20;
 
 let gravity = new Box2D.b2Vec2(0, -10);
 
@@ -29,8 +29,8 @@ function createBox(x, y, w, h, fixed) {
 
   let sprite = PIXI.Sprite.from(PIXI.Texture.WHITE);
   // dunno why this has to be times 2
-  sprite.width = w * window.PTM * 2;
-  sprite.height = h * window.PTM * 2;
+  sprite.width = w * PTM * 2;
+  sprite.height = h * PTM * 2;
   sprite.anchor.set(0.5);
   sprite.body = body;
   pixiApp.stage.addChild(sprite);
@@ -81,7 +81,7 @@ function init() {
     // Sync box and its physics
     for (let sprite of sprites) {
       const pos = sprite.body.GetPosition();
-      sprite.position.set(pos.get_x() * window.PTM, -pos.get_y() * window.PTM);
+      sprite.position.set(pos.get_x() * PTM, -pos.get_y() * PTM);
       sprite.rotation = -sprite.body.GetAngle();
     }
 
@@ -103,8 +103,8 @@ function init() {
   }, 10);
 
   pixiApp.view.addEventListener('click', function(e) {
-    let x = ((e.clientX - pixiApp.view.offsetLeft) - w/2) / window.PTM;
-    let y = (-(e.clientY - pixiApp.view.offsetTop) + h/2) / window.PTM;
+    let x = ((e.clientX - pixiApp.view.offsetLeft) - w/2) / PTM;
+    let y = (-(e.clientY - pixiApp.view.offsetTop) + h/2) / PTM;
     if (e.shiftKey) {
       rainMaker.spawnParticles(1, x, y);
     } else {
