@@ -8,8 +8,8 @@ PIXI.WebGLRenderer.registerPlugin('liquidfun', LiquidfunRenderer);
 
 let sprites = [];
 let world;
+let pixiApp;
 window.PTM = 20;
-window.renderer;
 
 let gravity = new Box2D.b2Vec2(0, -10);
 
@@ -33,7 +33,7 @@ function createBox(x, y, w, h, fixed) {
   sprite.height = h * window.PTM * 2;
   sprite.anchor.set(0.5);
   sprite.body = body;
-  window.renderer.stage.addChild(sprite);
+  pixiApp.stage.addChild(sprite);
   sprites.push(sprite);
   return body;
 }
@@ -45,10 +45,10 @@ function createParticleSystem() {
   particleSystem.SetMaxParticleCount(5000);
 
   let dummy = PIXI.Sprite.from(PIXI.Texture.EMPTY);
-  window.renderer.stage.addChild(dummy);
+  pixiApp.stage.addChild(dummy);
 
-  const particleSystemSprite = new LiquidfunSprite(particleSystem);
-  window.renderer.stage.addChild(particleSystemSprite);
+  const particleSystemSprite = new LiquidfunSprite(particleSystem, pixiApp.renderer);
+  pixiApp.stage.addChild(particleSystemSprite);
   return particleSystem;
 }
 
@@ -60,8 +60,8 @@ function init() {
   // renderer
   let w = window.innerWidth;
   let h = window.innerHeight;
-  window.renderer = new PIXI.Application(w, h, {backgroundColor : 0x8BB174});
-  document.body.appendChild(window.renderer.view);
+  pixiApp = new PIXI.Application(w, h, {backgroundColor : 0x8BB174});
+  document.body.appendChild(pixiApp.view);
 
   //let killerShape = new Box2D.b2PolygonShape;
   //killerShape.SetAsBox(w, h);
@@ -69,15 +69,15 @@ function init() {
   //killerTransform.Set(new Box2D.b2Vec2(0, 0), 0);
 
   // shift 0/0 to the center
-  window.renderer.stage.position.x = w/2;
-  window.renderer.stage.position.y = h/2;
+  pixiApp.stage.position.x = w/2;
+  pixiApp.stage.position.y = h/2;
 
   // world
   world = new Box2D.b2World(gravity);
 
   createBox(0, 0, 5, 1, true);
 
-  window.renderer.ticker.add(function() {
+  pixiApp.ticker.add(function() {
     for (let i=0,s=sprites[i];i<sprites.length;s=sprites[++i]) {
       let pos = s.body.GetPosition();
       s.position.set(pos.get_x()*window.PTM, -pos.get_y()*window.PTM);
@@ -100,9 +100,9 @@ function init() {
     rainMaker.spawnRain();
   }, 10);
 
-  window.renderer.view.addEventListener('click', function(e) {
-    let x = ((e.clientX - window.renderer.view.offsetLeft) - w/2) / window.PTM;
-    let y = (-(e.clientY - window.renderer.view.offsetTop) + h/2) / window.PTM;
+  pixiApp.view.addEventListener('click', function(e) {
+    let x = ((e.clientX - pixiApp.view.offsetLeft) - w/2) / window.PTM;
+    let y = (-(e.clientY - pixiApp.view.offsetTop) + h/2) / window.PTM;
     if (e.shiftKey) {
       rainMaker.spawnParticles(1, x, y);
     } else {

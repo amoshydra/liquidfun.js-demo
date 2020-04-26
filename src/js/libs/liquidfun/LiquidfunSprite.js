@@ -15,15 +15,16 @@ const loadShaders = async (obj) => Object.fromEntries(
 );
 
 export class LiquidfunSprite extends PIXI.Container {
-  constructor(particleSystem) {
+  constructor(particleSystem, renderer) {
     super();
 
+    this.renderer = renderer;
     this.particleSystem = particleSystem;
 
     this.renderLoop = () => {};
     this.setupShaders()
       .then(() => {
-        this.renderLoop = this.render.bind(this)
+        this.renderLoop = this.render.bind(this);
       })
     ;
   }
@@ -37,12 +38,12 @@ export class LiquidfunSprite extends PIXI.Container {
       thresholdFrag: 'threshold.fs.glsl',
     });
 
-    this.ball_shader = new PIXI.glCore.GLShader(renderer.renderer.gl, shaders.ballVert, shaders.ballFrag);
-    this.blur_shader = new PIXI.glCore.GLShader(renderer.renderer.gl, shaders.identifyVert, shaders.blurFrag);
-    this.threshold_shader = new PIXI.glCore.GLShader(renderer.renderer.gl, shaders.identifyVert, shaders.thresholdFrag);
-    this.pos_buffer = renderer.renderer.gl.createBuffer();
-    this.color_buffer = renderer.renderer.gl.createBuffer();
-    this.quadbuffer = renderer.renderer.gl.createBuffer();
+    this.ball_shader = new PIXI.glCore.GLShader(this.renderer.gl, shaders.ballVert, shaders.ballFrag);
+    this.blur_shader = new PIXI.glCore.GLShader(this.renderer.gl, shaders.identifyVert, shaders.blurFrag);
+    this.threshold_shader = new PIXI.glCore.GLShader(this.renderer.gl, shaders.identifyVert, shaders.thresholdFrag);
+    this.pos_buffer = this.renderer.gl.createBuffer();
+    this.color_buffer = this.renderer.gl.createBuffer();
+    this.quadbuffer = this.renderer.gl.createBuffer();
   }
 
   _renderWebGL(renderer) {
