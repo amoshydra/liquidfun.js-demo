@@ -38,8 +38,8 @@ function init() {
   document.body.appendChild(pixiApp.view);
 
   // shift 0/0 to the center
-  pixiApp.stage.position.x = w/2;
-  pixiApp.stage.position.y = h/2;
+  pixiApp.stage.position.x = w / 2;
+  pixiApp.stage.position.y = h / 2;
 
   // world
   world = new Box2D.b2World(gravity);
@@ -57,9 +57,10 @@ function init() {
   });
 
   // update loop
+  const msPerFrame = 1/60;
   function update() {
     //particleSystem.DestroyParticlesInShape(killerShape, killerTransform);
-    world.Step(1/60, 8, 3);
+    world.Step(msPerFrame, 8, 3);
   }
 
   const particleSystem = createParticleSystem();
