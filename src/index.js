@@ -31,11 +31,11 @@ function createBox(x, y, w, h, fixed) {
 
   let sprite = PIXI.Sprite.from(PIXI.Texture.WHITE);
   // dunno why this has to be times 2
-  sprite.width = w * PTM * 2;
-  sprite.height = h * PTM * 2;
+  sprite.width = w * window.PTM * 2;
+  sprite.height = h * window.PTM * 2;
   sprite.anchor.set(0.5);
   sprite.body = body;
-  renderer.stage.addChild(sprite);
+  window.renderer.stage.addChild(sprite);
   sprites.push(sprite);
   return body;
 }
@@ -47,10 +47,10 @@ function createParticleSystem() {
   particleSystem.SetMaxParticleCount(5000);
 
   let dummy = PIXI.Sprite.from(PIXI.Texture.EMPTY);
-  renderer.stage.addChild(dummy);
+  window.renderer.stage.addChild(dummy);
 
   const particleSystemSprite = new LiquidfunSprite(particleSystem);
-  renderer.stage.addChild(particleSystemSprite);
+  window.renderer.stage.addChild(particleSystemSprite);
 }
 
 function spawnParticles(radius, x, y) {
@@ -71,6 +71,7 @@ function spawnParticles(radius, x, y) {
 
 function spawnRain() {
   let x = getRandom(-25, 25);
+  // eslint-disable-next-line no-unused-vars
   let group = spawnParticles(0.09, x, 25);
   //group.ApplyLinearImpulse(wind);
 }
@@ -84,7 +85,7 @@ function init() {
   let w = window.innerWidth;
   let h = window.innerHeight;
   window.renderer = new PIXI.Application(w, h, {backgroundColor : 0x8BB174});
-  document.body.appendChild(renderer.view);
+  document.body.appendChild(window.renderer.view);
 
   //let killerShape = new Box2D.b2PolygonShape;
   //killerShape.SetAsBox(w, h);
@@ -92,8 +93,8 @@ function init() {
   //killerTransform.Set(new Box2D.b2Vec2(0, 0), 0);
 
   // shift 0/0 to the center
-  renderer.stage.position.x = w/2;
-  renderer.stage.position.y = h/2;
+  window.renderer.stage.position.x = w/2;
+  window.renderer.stage.position.y = h/2;
 
   // world
   world = new Box2D.b2World(gravity);
@@ -102,10 +103,10 @@ function init() {
 
   createParticleSystem();
 
-  renderer.ticker.add(function() {
+  window.renderer.ticker.add(function() {
     for (let i=0,s=sprites[i];i<sprites.length;s=sprites[++i]) {
       let pos = s.body.GetPosition();
-      s.position.set(pos.get_x()*PTM, -pos.get_y()*PTM)
+      s.position.set(pos.get_x()*window.PTM, -pos.get_y()*window.PTM);
       s.rotation = -s.body.GetAngle();
     }
     stats.update();
@@ -119,15 +120,15 @@ function init() {
   window.setInterval(update, 1000 / 60);
   window.setInterval(spawnRain, 10);
 
-  renderer.view.addEventListener("click", function(e) {
-    let x = ((e.clientX - renderer.view.offsetLeft) - w/2) / PTM;
-    let y = (-(e.clientY - renderer.view.offsetTop) + h/2) / PTM;
+  window.renderer.view.addEventListener('click', function(e) {
+    let x = ((e.clientX - window.renderer.view.offsetLeft) - w/2) / window.PTM;
+    let y = (-(e.clientY - window.renderer.view.offsetTop) + h/2) / window.PTM;
     if (e.shiftKey) {
       spawnParticles(1, x, y);
     } else {
       createBox(x, y, 1, 1, e.ctrlKey);
     }
   });
-};
+}
 
-window.addEventListener("load", init);
+window.addEventListener('load', init);
