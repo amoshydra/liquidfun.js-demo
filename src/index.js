@@ -2,19 +2,17 @@ import * as PIXI from 'pixi.js';
 import Stats from 'stats.js';
 import { LiquidfunRenderer } from './js/libs/liquidfun/LiquidfunRenderer.js';
 import { LiquidfunSprite } from './js/libs/liquidfun/LiquidfunSprite.js';
+import { RainMaker } from './js/libs/RainMaker';
 
 PIXI.WebGLRenderer.registerPlugin('liquidfun', LiquidfunRenderer);
 
 let sprites = [];
-let world, particleSystem;
+let world;
 window.PTM = 20;
 window.renderer;
 
 let gravity = new Box2D.b2Vec2(0, -10);
 
-function getRandom(min, max) {
-  return Math.random() * (max - min) + min;
-}
 
 function createBox(x, y, w, h, fixed) {
   let bd = new Box2D.b2BodyDef();
@@ -43,7 +41,7 @@ function createBox(x, y, w, h, fixed) {
 function createParticleSystem() {
   let psd = new Box2D.b2ParticleSystemDef();
   psd.set_radius(0.1);
-  particleSystem = world.CreateParticleSystem(psd);
+  const particleSystem = world.CreateParticleSystem(psd);
   particleSystem.SetMaxParticleCount(5000);
 
   let dummy = PIXI.Sprite.from(PIXI.Texture.EMPTY);
@@ -51,29 +49,7 @@ function createParticleSystem() {
 
   const particleSystemSprite = new LiquidfunSprite(particleSystem);
   window.renderer.stage.addChild(particleSystemSprite);
-}
-
-function spawnParticles(radius, x, y) {
-  let color = new Box2D.b2ParticleColor(0, 0, 255, 255);
-  // flags
-  let flags = (0<<0);
-
-  let pgd = new Box2D.b2ParticleGroupDef();
-  let shape = new Box2D.b2CircleShape();
-  shape.set_m_radius(radius);
-  pgd.set_shape(shape);
-  pgd.set_color(color);
-  pgd.set_flags(flags);
-  shape.set_m_p(new Box2D.b2Vec2(x, y));
-  const group = particleSystem.CreateParticleGroup(pgd);
-  return group;
-}
-
-function spawnRain() {
-  let x = getRandom(-25, 25);
-  // eslint-disable-next-line no-unused-vars
-  let group = spawnParticles(0.09, x, 25);
-  //group.ApplyLinearImpulse(wind);
+  return particleSystem;
 }
 
 function init() {
@@ -101,8 +77,6 @@ function init() {
 
   createBox(0, 0, 5, 1, true);
 
-  createParticleSystem();
-
   window.renderer.ticker.add(function() {
     for (let i=0,s=sprites[i];i<sprites.length;s=sprites[++i]) {
       let pos = s.body.GetPosition();
@@ -117,14 +91,20 @@ function init() {
     //particleSystem.DestroyParticlesInShape(killerShape, killerTransform);
     world.Step(1/60, 8, 3);
   }
+
+  const particleSystem = createParticleSystem();
+  const rainMaker = new RainMaker(particleSystem);
+
   window.setInterval(update, 1000 / 60);
-  window.setInterval(spawnRain, 10);
+  window.setInterval(() => {
+    rainMaker.spawnRain();
+  }, 10);
 
   window.renderer.view.addEventListener('click', function(e) {
     let x = ((e.clientX - window.renderer.view.offsetLeft) - w/2) / window.PTM;
     let y = (-(e.clientY - window.renderer.view.offsetTop) + h/2) / window.PTM;
     if (e.shiftKey) {
-      spawnParticles(1, x, y);
+      rainMaker.spawnParticles(1, x, y);
     } else {
       createBox(x, y, 1, 1, e.ctrlKey);
     }
