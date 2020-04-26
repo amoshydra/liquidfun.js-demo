@@ -34,7 +34,7 @@ function init() {
   // renderer
   let w = window.innerWidth;
   let h = window.innerHeight;
-  pixiApp = new PIXI.Application(w, h, {backgroundColor : 0x8BB174});
+  pixiApp = new PIXI.Application(w, h, { backgroundColor : 0x091425 });
   document.body.appendChild(pixiApp.view);
 
   //let killerShape = new Box2D.b2PolygonShape;

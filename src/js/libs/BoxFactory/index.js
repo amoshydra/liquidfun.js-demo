@@ -31,6 +31,7 @@ export class BoxFactory {
 
     // Create render
     const sprite = PIXI.Sprite.from(PIXI.Texture.WHITE);
+    sprite.tint = 0x5441a9;
 
     // dunno why this has to be times 2
     sprite.width = w * PTM * 2;
