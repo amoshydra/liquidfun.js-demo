@@ -77,8 +77,8 @@ export class LiquidfunRenderer extends PIXI.ObjectRenderer {
 
     if (count > 0) {
         let w = gl.canvas.width, h = gl.canvas.height;
-        fx = 0;
-        fy = 0;
+        const fx = 0;
+        const fy = 0;
 
         // start with ball shader
         sprite.ball_shader.bind();
@@ -86,15 +86,13 @@ export class LiquidfunRenderer extends PIXI.ObjectRenderer {
         /* Position Buffer */
         // get pointer
         let pos_offset = sprite.particleSystem.GetPositionBuffer();
-        // read memory into JS Array
-        let raw_pos = new Float32Array(Module.HEAPU8.buffer, pos_offset.e, count * 2);
 
         // initalize new Array for corrected values
         let position = new Float32Array(count*2);
         // transform physics engine coords to renderer coords
         for (let i = 0; i < count; i++) {
-            position[i*2]   = (raw_pos[i*2]   - fx) * 2 * PTM / w;
-            position[i*2+1] = (raw_pos[i*2+1] - fy) * 2 * PTM / h;
+            position[i*2]   = (pos_offset[i].x - fx) * 2 * PTM / w;
+            position[i*2+1] = (pos_offset[i].y - fy) * 2 * PTM / h;
         }
         // upload data to gpu
         gl.bindBuffer(gl.ARRAY_BUFFER, sprite.pos_buffer);

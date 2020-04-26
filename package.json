@@ -19,6 +19,7 @@
     "serve": "webpack-dev-server --config dev/webpack-config/development.js"
   },
   "dependencies": {
+    "lucy-b2": "^1.0.1",
     "pixi.js": "4.7.0",
     "stats.js": "^0.17.0"
   }

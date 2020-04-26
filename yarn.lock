@@ -2257,6 +2257,11 @@ lru-cache@^5.1.1:
   dependencies:
     yallist "^3.0.2"
 
+lucy-b2@^1.0.1:
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/lucy-b2/-/lucy-b2-1.0.1.tgz#9b8af80d5e1a64d00f4a7401102ae325063fc934"
+  integrity sha1-m4r4DV4aZNAPSnQBECrjJQY/yTQ=
+
 make-dir@^2.0.0:
   version "2.1.0"
   resolved "https://registry.yarnpkg.com/make-dir/-/make-dir-2.1.0.tgz#5f0310e18b8be898cc07009295a30ae41e91e6f5"

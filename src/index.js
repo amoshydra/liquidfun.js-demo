@@ -1,5 +1,7 @@
 import * as PIXI from 'pixi.js';
 import Stats from 'stats.js';
+const b2 = require ('lucy-b2');
+
 import { LiquidfunRenderer } from './js/libs/liquidfun/LiquidfunRenderer.js';
 import { LiquidfunSprite } from './js/libs/liquidfun/LiquidfunSprite.js';
 
@@ -10,22 +12,22 @@ let world, particleSystem;
 window.PTM = 20;
 window.renderer;
 
-let gravity = new Box2D.b2Vec2(0, -10);
+let gravity = new b2.Vec2(0, -10);
 
 function getRandom(min, max) {
     return Math.random() * (max - min) + min;
 }
 
 function createBox(x, y, w, h, fixed) {
-    let bd = new Box2D.b2BodyDef();
+    let bd = new b2.BodyDef();
     if (!fixed) {
-        bd.set_type(2);
+        bd.type = 2;
     }
-    bd.set_position(new Box2D.b2Vec2(x, y));
+    bd.position = new b2.Vec2(x, y);
 
     let body = world.CreateBody(bd);
 
-    let shape = new Box2D.b2PolygonShape;
+    let shape = new b2.PolygonShape;
     shape.SetAsBox(w, h);
     body.CreateFixture(shape, 1.0);
 
@@ -41,8 +43,8 @@ function createBox(x, y, w, h, fixed) {
 }
 
 function createParticleSystem() {
-    let psd = new Box2D.b2ParticleSystemDef();
-    psd.set_radius(0.1);
+    let psd = new b2.ParticleSystemDef();
+    psd.radius  = 0.1;
     particleSystem = world.CreateParticleSystem(psd);
     particleSystem.SetMaxParticleCount(5000);
 
@@ -54,17 +56,17 @@ function createParticleSystem() {
 }
 
 function spawnParticles(radius, x, y) {
-    let color = new Box2D.b2ParticleColor(0, 0, 255, 255);
+    let color = new b2.ParticleColor(0, 0, 255, 255);
     // flags
     let flags = (0<<0);
 
-    let pgd = new Box2D.b2ParticleGroupDef();
-    let shape = new Box2D.b2CircleShape();
-    shape.set_m_radius(radius);
-    pgd.set_shape(shape);
-    pgd.set_color(color);
-    pgd.set_flags(flags);
-    shape.set_m_p(new Box2D.b2Vec2(x, y));
+    let pgd = new b2.ParticleGroupDef();
+    let shape = new b2.CircleShape();
+    shape.m_radius  = radius;
+    pgd.shape  = shape;
+    pgd.color  = color;
+    pgd.flags  = flags;
+    shape.m_p  = new b2.Vec2(x, y);
     const group = particleSystem.CreateParticleGroup(pgd);
     return group;
 }
@@ -86,17 +88,17 @@ function init() {
     window.renderer = new PIXI.Application(w, h, {backgroundColor : 0x8BB174});
     document.body.appendChild(renderer.view);
 
-    //let killerShape = new Box2D.b2PolygonShape;
+    //let killerShape = new b2.PolygonShape;
     //killerShape.SetAsBox(w, h);
-    //let killerTransform = new Box2D.b2Transform;
-    //killerTransform.Set(new Box2D.b2Vec2(0, 0), 0);
+    //let killerTransform = new b2.Transform;
+    //killerTransform.Set(new b2.Vec2(0, 0), 0);
 
     // shift 0/0 to the center
     renderer.stage.position.x = w/2;
     renderer.stage.position.y = h/2;
 
     // world
-    world = new Box2D.b2World(gravity);
+    world = new b2.World(gravity);
 
     createBox(0, 0, 5, 1, true);
 
@@ -105,7 +107,7 @@ function init() {
     renderer.ticker.add(function() {
         for (let i=0,s=sprites[i];i<sprites.length;s=sprites[++i]) {
             let pos = s.body.GetPosition();
-            s.position.set(pos.get_x()*PTM, -pos.get_y()*PTM)
+            s.position.set(pos.x*PTM, -pos.y*PTM)
             s.rotation = -s.body.GetAngle();
         }
         stats.update();
