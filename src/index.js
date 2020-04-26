@@ -86,13 +86,20 @@ function init() {
     rainMaker.spawnRain();
   }, 10);
 
+  let isMetaKeyDown = false;
+  pixiApp.view.addEventListener('keydown', function(e) {
+    console.log(e.metaKey || e.ctrlKey);
+  });
+  pixiApp.view.addEventListener('keyup', function() {
+    isMetaKeyDown = false;
+  });
   pixiApp.view.addEventListener('click', function(e) {
     let x = ((e.clientX - pixiApp.view.offsetLeft) - w/2) / PTM;
     let y = (-(e.clientY - pixiApp.view.offsetTop) + h/2) / PTM;
     if (e.shiftKey) {
       rainMaker.spawnParticles(config.spawnSize, x, y);
     } else {
-      boxFactory.create(x, y, 1, 1, e.ctrlKey);
+      boxFactory.create(x, y, 1, 1, e.ctrlKey || e.metaKey || isMetaKeyDown);
     }
   });
 }
