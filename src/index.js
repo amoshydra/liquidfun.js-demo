@@ -3,40 +3,14 @@ import Stats from 'stats.js';
 import { LiquidfunRenderer } from './js/libs/liquidfun/LiquidfunRenderer.js';
 import { LiquidfunSprite } from './js/libs/liquidfun/LiquidfunSprite.js';
 import { RainMaker } from './js/libs/RainMaker';
+import { BoxFactory, syncBoxPhysics } from './js/libs/BoxFactory';
 import { PTM } from './js/libs/PTM';
 
 PIXI.WebGLRenderer.registerPlugin('liquidfun', LiquidfunRenderer);
 
-let sprites = [];
 let world;
 let pixiApp;
-
 let gravity = new Box2D.b2Vec2(0, -10);
-
-
-function createBox(x, y, w, h, fixed) {
-  let bd = new Box2D.b2BodyDef();
-  if (!fixed) {
-    bd.set_type(2);
-  }
-  bd.set_position(new Box2D.b2Vec2(x, y));
-
-  let body = world.CreateBody(bd);
-
-  let shape = new Box2D.b2PolygonShape;
-  shape.SetAsBox(w, h);
-  body.CreateFixture(shape, 1.0);
-
-  let sprite = PIXI.Sprite.from(PIXI.Texture.WHITE);
-  // dunno why this has to be times 2
-  sprite.width = w * PTM * 2;
-  sprite.height = h * PTM * 2;
-  sprite.anchor.set(0.5);
-  sprite.body = body;
-  pixiApp.stage.addChild(sprite);
-  sprites.push(sprite);
-  return body;
-}
 
 function createParticleSystem() {
   let psd = new Box2D.b2ParticleSystemDef();
@@ -75,16 +49,15 @@ function init() {
   // world
   world = new Box2D.b2World(gravity);
 
-  createBox(0, 0, 5, 1, true);
+  const boxFactory = new BoxFactory({
+    stage: pixiApp.stage,
+    world,
+  });
+
+  boxFactory.create(0, 0, 5, 1, true);
 
   pixiApp.ticker.add(() => {
-    // Sync box and its physics
-    for (let sprite of sprites) {
-      const pos = sprite.body.GetPosition();
-      sprite.position.set(pos.get_x() * PTM, -pos.get_y() * PTM);
-      sprite.rotation = -sprite.body.GetAngle();
-    }
-
+    boxFactory.sprites.forEach(syncBoxPhysics);
     stats.update();
   });
 
@@ -108,7 +81,7 @@ function init() {
     if (e.shiftKey) {
       rainMaker.spawnParticles(1, x, y);
     } else {
-      createBox(x, y, 1, 1, e.ctrlKey);
+      boxFactory.create(x, y, 1, 1, e.ctrlKey);
     }
   });
 }
