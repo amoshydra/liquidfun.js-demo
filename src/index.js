@@ -5,6 +5,7 @@ import { LiquidfunSprite } from './js/libs/liquidfun/LiquidfunSprite.js';
 import { RainMaker } from './js/libs/RainMaker';
 import { BoxFactory, syncBoxPhysics } from './js/libs/BoxFactory';
 import { PTM } from './js/libs/PTM';
+import { controlPanel } from './js/libs/PanelGUI';
 
 PIXI.WebGLRenderer.registerPlugin('liquidfun', LiquidfunRenderer);
 
@@ -49,7 +50,7 @@ function init() {
     world,
   });
 
-  boxFactory.create(0, 0, 5, 1, true);
+  boxFactory.create(0, -h / 2.5 / PTM, w / 4 / PTM, 0.25, true);
 
   pixiApp.ticker.add(() => {
     boxFactory.sprites.forEach(syncBoxPhysics);
@@ -66,6 +67,20 @@ function init() {
   const particleSystem = createParticleSystem();
   const rainMaker = new RainMaker(particleSystem);
 
+  const config = {
+    spawnSize: 1,
+    _maxParticleCount: 5000,
+    set maxParticleCount(count) {
+      config._maxParticleCount = count;
+      particleSystem.SetMaxParticleCount(count);
+    },
+    get maxParticleCount() {
+      return config._maxParticleCount;
+    }
+  };
+  controlPanel.add(config, 'spawnSize', 0.09, 6, 0.01);
+  controlPanel.add(config, 'maxParticleCount', 1, 10000);
+
   window.setInterval(update, 1000 / 60);
   window.setInterval(() => {
     rainMaker.spawnRain();
@@ -75,7 +90,7 @@ function init() {
     let x = ((e.clientX - pixiApp.view.offsetLeft) - w/2) / PTM;
     let y = (-(e.clientY - pixiApp.view.offsetTop) + h/2) / PTM;
     if (e.shiftKey) {
-      rainMaker.spawnParticles(1, x, y);
+      rainMaker.spawnParticles(config.spawnSize, x, y);
     } else {
       boxFactory.create(x, y, 1, 1, e.ctrlKey);
     }
